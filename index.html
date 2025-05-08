@@ -4,6 +4,8 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Tienda de Ropa</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css"/>
+
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
   <link rel="stylesheet" href="css/style.css">
@@ -17,6 +19,10 @@
       flex-direction: column;
       align-items: center;
       min-height: 100vh;
+    }
+
+    .hidden {
+      display: none;
     }
 
     #product-list,
@@ -56,10 +62,6 @@
       margin-bottom: 10px;
     }
 
-    .hidden {
-      display: none;
-    }
-
     @media (max-width: 600px) {
       .product img {
         max-height: 150px;
@@ -95,32 +97,84 @@
   </style>
 </head>
 <body>
-  <div id="login-container" class="container text-center mt-5">
-    <div class="card p-4 mx-auto" style="max-width: 400px;">
-      <h2>Iniciar Sesión</h2>
-      <input type="text" id="username" class="form-control mb-2" placeholder="Usuario">
-      <input type="password" id="password" class="form-control mb-2" placeholder="Contraseña">
-      <button class="btn btn-primary w-100" onclick="login()">Ingresar</button>
-      <p id="login-error" class="text-danger mt-2"></p>
+
+  <!-- CONTENEDOR LOGIN Y REGISTRO -->
+  <div id="login-container" class="container text-center mt-5" style="background-color: #761b92;">
+    <div class="row shadow-lg rounded overflow-hidden d-flex align-items-stretch" style="max-width: 900px; margin: auto;">
+      
+      <!-- FORMULARIOS -->
+      <div class="col-md-6 bg-white p-5 d-flex flex-column justify-content-center">
+        <!-- LOGIN -->
+        <div id="login-form">
+          <h2 class="text-center mb-4">Iniciar Sesión</h2>
+          <input type="text" id="username" class="form-control mb-3" placeholder="Usuario">
+          <input type="password" id="password" class="form-control mb-3" placeholder="Contraseña">
+          <button class="btn btn-primary w-100 mb-2" onclick="login()">Ingresar</button>
+        
+
+          <p id="login-error" class="text-danger text-center mt-2"></p>
+        </div>
+
+        <!-- REGISTRO -->
+  <div id="register-form" class="hidden">
+    <h2 class="text-center mb-4">Registro de Usuario</h2>
+    <input type="text" id="register-username" class="form-control mb-3" placeholder="Nuevo usuario">
+    <input type="password" id="register-password" class="form-control mb-3" placeholder="Nueva contraseña">
+    <button class="btn btn-success w-100 mb-2" onclick="registerUser()">Crear Cuenta</button>
+    <button class="btn btn-outline-secondary w-100" onclick="mostrarLogin()">Volver</button>
+    <p id="register-error" class="text-danger text-center mt-2"></p>
+  </div>
+
+        <!-- Enlace para cambiar -->
+        <p class="mt-3">
+          <a href="javascript:void(0)" id="toggle-form">¿No tienes cuenta? Regístrate aquí</a>
+        </p>
+      </div>
+
+      <!-- IMAGEN -->
+      <div class="col-md-6 d-none d-md-block p-0">
+        <img src="imagen/imagensale.jpg" alt="Logo" class="img-fluid h-100 w-100 object-fit-cover">
+      </div>
     </div>
   </div>
 
+  <!-- TIENDA USUARIO -->
   <div id="shop-container" class="hidden container mt-4">
+    <!-- ALERTA DE NUEVO PRODUCTO -->
+<!-- ALERTA DE NUEVO PRODUCTO -->
+<div id="new-product-alert" class="alert alert-danger shadow-lg alert-dismissible fade show position-fixed top-0 start-50 translate-middle-x mt-3 zindex-tooltip animate__animated animate__fadeInDown" role="alert" style="display: none; width: auto; max-width: 90%;">
+  <div class="d-flex align-items-center">
+    <span class="fs-5 me-2">🔔</span>
+    <strong>¡Se ha agregado un nuevo producto!</strong>
+    <button 
+      type="button" 
+      class="btn btn-sm btn-danger ms-3 animate__animated animate__pulse animate__infinite" 
+      onclick="mostrarSoloNuevos()">
+      🔍 Ver productos nuevos
+    </button>
+  </div>
+  <button type="button" class="btn-close" onclick="closeNewProductAlert()"></button>
+</div>
+
+    
+
+    <div id="nombre-usuario" class="text-end pe-3 pb-2 fw-bold text-primary"></div>
+
     <h2 class="text-center">Bienvenido a la Tienda</h2>
     <div class="mb-3 text-center">
-      
       <input type="text" id="search-keyword" class="form-control mb-2" placeholder="Buscar por nombre o descripción" oninput="filterProducts()">
       <input type="number" id="search-price" class="form-control mb-2" placeholder="Filtrar por precio máximo" oninput="filterProducts()">
     </div>
     <div class="text-center mt-3">
       <button class="btn btn-primary" onclick="refreshUserProducts()">Actualizar Productos</button>
-    </div>    
+    </div>
     <div id="product-list"></div>
     <div class="text-center mt-3">
       <button class="btn btn-secondary" onclick="logout()">Cerrar sesión</button>
     </div>
   </div>
 
+  <!-- ADMIN -->
   <div id="admin-container" class="hidden container mt-4">
     <h2 class="text-center">Panel del Administrador</h2>
     <div class="card p-3 mb-3">
@@ -136,14 +190,33 @@
     </div>
   </div>
 
-  <div id="product-modal">
-    <div id="product-modal-content">
-      <img id="modal-img" src="" alt="Producto">
-      <button class="btn btn-outline-danger" onclick="document.getElementById('product-modal').style.display='none'">Cerrar</button>
+  <!-- MODAL PRODUCTO -->
+<!-- Modal de imagen -->
+<div id="product-modal" class="modal" tabindex="-1" aria-labelledby="product-modal-label" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content">
+      <div class="modal-body text-center">
+        <img id="modal-img" class="img-fluid" src="" alt="Imagen del producto">
+      </div>
+      <!-- Botón de cerrar en la parte inferior -->
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" onclick="closeImageModal()">Cerrar</button>
+      </div>
     </div>
   </div>
-  
+</div>
 
+
+  <script>
+    // Alternancia de formularios login <-> registro
+    document.getElementById("toggle-form").addEventListener("click", function () {
+      document.getElementById("login-form").classList.toggle("hidden");
+      document.getElementById("register-form").classList.toggle("hidden");
+      this.textContent = document.getElementById("register-form").classList.contains("hidden")
+        ? "¿No tienes cuenta? Regístrate aquí"
+        : "¿Ya tienes cuenta? Inicia sesión aquí";
+    });
+  </script>
   <script src="js/script.js"></script>
 </body>
 </html>
