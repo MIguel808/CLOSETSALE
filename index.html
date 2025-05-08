@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Tienda de Ropa</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+  <link rel="stylesheet" href="css/style.css">
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      padding: 20px;
+      margin: 0;
+      background-color: #f4f4f4;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      min-height: 100vh;
+    }
+
+    #product-list,
+    #admin-product-list {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+      gap: 20px;
+      width: 100%;
+      max-width: 1200px;
+      margin-top: 20px;
+    }
+
+    .product {
+      background-color: white;
+      border: 1px solid #ccc;
+      border-radius: 8px;
+      box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+      padding: 15px;
+      text-align: center;
+      height: auto;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      overflow: hidden;
+      transition: transform 0.3s;
+    }
+
+    .product:hover {
+      transform: scale(1.02);
+      cursor: pointer;
+    }
+
+    .product img {
+      max-width: 100%;
+      max-height: 200px;
+      object-fit: contain;
+      margin-bottom: 10px;
+    }
+
+    .hidden {
+      display: none;
+    }
+
+    @media (max-width: 600px) {
+      .product img {
+        max-height: 150px;
+      }
+    }
+
+    #product-modal {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100vw;
+      height: 100vh;
+      background-color: rgba(0,0,0,0.7);
+      display: none;
+      justify-content: center;
+      align-items: center;
+      z-index: 9999;
+    }
+
+    #product-modal-content {
+      background: white;
+      padding: 20px;
+      border-radius: 8px;
+      max-width: 400px;
+      text-align: center;
+    }
+
+    #product-modal img {
+      max-width: 100%;
+      max-height: 300px;
+      margin-bottom: 15px;
+    }
+  </style>
+</head>
+<body>
+  <div id="login-container" class="container text-center mt-5">
+    <div class="card p-4 mx-auto" style="max-width: 400px;">
+      <h2>Iniciar Sesión</h2>
+      <input type="text" id="username" class="form-control mb-2" placeholder="Usuario">
+      <input type="password" id="password" class="form-control mb-2" placeholder="Contraseña">
+      <button class="btn btn-primary w-100" onclick="login()">Ingresar</button>
+      <p id="login-error" class="text-danger mt-2"></p>
+    </div>
+  </div>
+
+  <div id="shop-container" class="hidden container mt-4">
+    <h2 class="text-center">Bienvenido a la Tienda</h2>
+    <div class="mb-3 text-center">
+      
+      <input type="text" id="search-keyword" class="form-control mb-2" placeholder="Buscar por nombre o descripción" oninput="filterProducts()">
+      <input type="number" id="search-price" class="form-control mb-2" placeholder="Filtrar por precio máximo" oninput="filterProducts()">
+    </div>
+    <div class="text-center mt-3">
+      <button class="btn btn-primary" onclick="refreshUserProducts()">Actualizar Productos</button>
+    </div>    
+    <div id="product-list"></div>
+    <div class="text-center mt-3">
+      <button class="btn btn-secondary" onclick="logout()">Cerrar sesión</button>
+    </div>
+  </div>
+
+  <div id="admin-container" class="hidden container mt-4">
+    <h2 class="text-center">Panel del Administrador</h2>
+    <div class="card p-3 mb-3">
+      <input type="text" id="new-product-name" class="form-control mb-2" placeholder="Nombre del artículo">
+      <textarea id="new-product-desc" class="form-control mb-2" placeholder="Descripción"></textarea>
+      <input type="number" id="new-product-price" class="form-control mb-2" placeholder="Precio">
+      <input type="file" id="new-product-img" class="form-control mb-2" accept="image/*">
+      <button class="btn btn-success w-100" onclick="addProduct()">Agregar Artículo</button>
+    </div>
+    <div id="admin-product-list"></div>
+    <div class="text-center mt-3">
+      <button class="btn btn-secondary" onclick="logout()">Cerrar sesión</button>
+    </div>
+  </div>
+
+  <div id="product-modal">
+    <div id="product-modal-content">
+      <img id="modal-img" src="" alt="Producto">
+      <button class="btn btn-outline-danger" onclick="document.getElementById('product-modal').style.display='none'">Cerrar</button>
+    </div>
+  </div>
+  
+
+  <script src="js/script.js"></script>
+</body>
+</html>
